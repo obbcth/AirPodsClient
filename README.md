@@ -11,9 +11,7 @@ AirPods Client for Windows
 
 ## Dependencies
 - Python 3
-- pip install bleak
-- pip install pybluez
-- pip install infi.systray
+- `pip install bleak pybluez infi.systray`
 
 ## Reference
 - [ohanedan/Airpods-Windows-Service](https://github.com/ohanedan/Airpods-Windows-Service)
