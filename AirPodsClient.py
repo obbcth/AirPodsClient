@@ -3,6 +3,27 @@ from bleak import discover
 import bluetooth
 from time import time,sleep
 
+from infi.systray import SysTrayIcon
+
+
+def get_name(systray):    
+    print("Scanning devices...")
+    nearby_devices = bluetooth.discover_devices(lookup_names=True)
+    print("Found {} devices.".format(len(nearby_devices)))
+    num = 1
+    for addr, name in nearby_devices:
+        print("  "+str(num)+". {} - {}".format(addr, name))
+        num = num + 1
+    n = input("Please select your device (Default is 1) : ")
+    if n == "":
+        n = 1
+    print("Your device name is " + nearby_devices[int(n)-1][1])
+
+menu_options = (("Strange function...", None, get_name),) # How to update items?
+systray = SysTrayIcon("white.ico", "Scanning devices...", menu_options)
+systray.start()
+
+
 async def run():
     result = EmptyResult()
     devices = await discover()
@@ -52,7 +73,7 @@ def parseValues(result, flipped):
     elif result['model'] == 'f':
         result['model'] = "2"
     else:
-        result['model'] = "Unknown"
+        result['model'] = "Unknown"  # I don't know AirPods 1 code
 
     result['left'] = int(result['left'], 16) * 10
     result['right'] = int(result['right'], 16) * 10
@@ -99,28 +120,19 @@ def fetch_status():
     loop.close()
     return data
 
-def get_name():
-    print("Scanning devices...")
-    nearby_devices = bluetooth.discover_devices(lookup_names=True)
-    print("Found {} devices.".format(len(nearby_devices)))
-    num = 1
-    for addr, name in nearby_devices:
-        print("  "+str(num)+". {} - {}".format(addr, name))
-        num = num + 1
-    n = input("Please select your device (Default is 1) : ")
-    if n == "":
-        n = 1
-    print("Your device name is " + nearby_devices[int(n)-1][1])
-
-
-get_name()
-# This is not actually needed
 
 while True:
     result = fetch_status()
 
-    print("Model : AirPods", result['model'])
-    print("Left :", result['left'])
-    print("Right :", result['right'])
-    print("Case :", result["case"])
-    print()
+    status = "L: " + str(result['left']) + " / R: " + str(result['right']) + " / C: " + str(result['case'])
+    status = status.replace('-1', '?')
+
+    if result['model'] == "Pro":
+        systray.update("orange.ico", status)
+
+    if result['model'] == "2":
+        systray.update("lightblue.ico", status)
+    
+    if result['model'] == "Unknown":  # Also AirPods 1 will show this color
+        systray.update("red.ico", status)
+    
