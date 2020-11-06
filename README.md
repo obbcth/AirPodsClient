@@ -9,6 +9,12 @@ AirPods Client for Windows
 | Red           | AirPods Unknown   |
 * Since I can't test AirPods 1, the icon will be marked red.
 
+## Dependencies
+- Python 3
+- pip install bleak
+- pip install pybluez
+- pip install infi.systray
+
 ## Reference
 - [ohanedan/Airpods-Windows-Service](https://github.com/ohanedan/Airpods-Windows-Service)
 - [Infinidat/infi.systray](https://github.com/Infinidat/infi.systray)
