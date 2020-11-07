@@ -116,11 +116,11 @@ while True:
     status = status.replace('False', '')
 
     if result['model'] == "Pro":
-        systray.update("orange.ico", status)
+        systray.update("lightblue.ico", status)
 
     if result['model'] == "2":
-        systray.update("lightblue.ico", status)
+        systray.update("lightgreen.ico", status)
     
     if result['model'] == "Unknown":  # Also AirPods 1 will show this color
-        systray.update("red.ico", status)
+        systray.update("orange.ico", status)
     
