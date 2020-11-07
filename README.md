@@ -5,16 +5,18 @@ AirPods Client for Windows
 | ------------------- | ------------------------------------------- |
 | White      | Scanning Devices      |
 | Orange           | AirPods Pro    |
-| Light Blue              | AirPods 2              |
+| Light Blue              | AirPods 2 (Wired)           |
 | Red           | AirPods Unknown   |
-* Since I can't test AirPods 1, the icon will be marked red.
+* Not tested on AirPods 2 Wireless and AirPods 1.
 
 ## Requirements
 - Python 3
 - `pip install bleak pybluez infi.systray`
 
 ## Usage
-Run AirPodsClient.py with `python.exe` or `pythonw.exe`(Recommended).
+1. Clone this project.
+1. Install Python 3 and run `pip install bleak pybluez infi.systray`.
+1. Run `pythonw.exe AirPodsClient.py`.
 
 ## Reference
 - [ohanedan/Airpods-Windows-Service](https://github.com/ohanedan/Airpods-Windows-Service)
