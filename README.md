@@ -1,12 +1,12 @@
 # AirPodsClient
 AirPods Client for Windows
 
-| Color | Detail                                                  |
-| ------------------- | ------------------------------------------- |
-| White      | Scanning Devices      |
-| Orange           | AirPods Pro    |
-| Light Blue              | AirPods 2 (Wired)           |
-| Red           | AirPods Unknown   |
+| Color | Detail |
+| ----- | ------ |
+| White       | Scanning Devices  |
+| Light Blue  | AirPods Pro       |
+| Light Green | AirPods 2 (Wired) |
+| Orange      | AirPods Unknown   |
 * Not tested on AirPods 2 Wireless and AirPods 1.
 
 ## Requirements
