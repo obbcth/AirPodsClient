@@ -2,24 +2,15 @@ import asyncio,threading
 from bleak import discover
 import bluetooth
 from time import time,sleep
+import webbrowser
 
 from infi.systray import SysTrayIcon
 
 
-def get_name(systray):    
-    print("Scanning devices...")
-    nearby_devices = bluetooth.discover_devices(lookup_names=True)
-    print("Found {} devices.".format(len(nearby_devices)))
-    num = 1
-    for addr, name in nearby_devices:
-        print("  "+str(num)+". {} - {}".format(addr, name))
-        num = num + 1
-    n = input("Please select your device (Default is 1) : ")
-    if n == "":
-        n = 1
-    print("Your device name is " + nearby_devices[int(n)-1][1])
+def open_homepage(systray):
+    webbrowser.open('https://github.com/obbcth/AirPodsClient', new=2)
 
-menu_options = (("Strange function...", None, get_name),) # How to update items?
+menu_options = (("Visit GitHub", None, open_homepage),)
 systray = SysTrayIcon("white.ico", "Scanning devices...", menu_options)
 systray.start()
 
