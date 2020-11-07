@@ -56,10 +56,8 @@ def isFlipped(data):
 def parseValues(result, flipped):
     if result['model'] == 'e': 
         result['model'] = "Pro"
-    elif result['model'] == 'f': # Tested on AirPods 2 with wired case
-        result['model'] = "2"
     else:
-        result['model'] = "Unknown"  # I don't know AirPods 1 code // need to check AirPods 2 with wireless case
+        result['model'] = "Unknown"
 
     result['left'] = int(result['left'], 16) * 10
     result['right'] = int(result['right'], 16) * 10
@@ -118,9 +116,6 @@ while True:
     if result['model'] == "Pro":
         systray.update("lightblue.ico", status)
 
-    if result['model'] == "2":
+    if result['model'] == "Unknown":
         systray.update("lightgreen.ico", status)
-    
-    if result['model'] == "Unknown":  # Also AirPods 1 will show this color
-        systray.update("orange.ico", status)
     
