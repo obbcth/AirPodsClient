@@ -1,11 +1,7 @@
-import asyncio,threading
 from bleak import discover
-import bluetooth
 from time import time,sleep
-import webbrowser
-
 from infi.systray import SysTrayIcon
-
+import asyncio, threading, bluetooth, webbrowser
 
 def open_homepage(systray):
     webbrowser.open('https://github.com/obbcth/AirPodsClient', new=2)
@@ -13,7 +9,6 @@ def open_homepage(systray):
 menu_options = (("Visit GitHub", None, open_homepage),)
 systray = SysTrayIcon("white.ico", "Scanning devices...", menu_options)
 systray.start()
-
 
 async def run():
     result = EmptyResult()
@@ -59,12 +54,12 @@ def isFlipped(data):
     return format((int(""+data[10], 16)+(0x10)), 'b')[3] == '0'
 
 def parseValues(result, flipped):
-    if result['model'] == 'e':
+    if result['model'] == 'e': 
         result['model'] = "Pro"
-    elif result['model'] == 'f':
+    elif result['model'] == 'f': # Tested on AirPods 2 with wired case
         result['model'] = "2"
     else:
-        result['model'] = "Unknown"  # I don't know AirPods 1 code
+        result['model'] = "Unknown"  # I don't know AirPods 1 code // need to check AirPods 2 with wireless case
 
     result['left'] = int(result['left'], 16) * 10
     result['right'] = int(result['right'], 16) * 10
@@ -79,14 +74,14 @@ def parseValues(result, flipped):
     if result['case'] > 100:
         result['case'] = -1
 
-    chargeStatus = int(result['charging_case'], 16)
+    chargeStatus = int(result['charging_case'], 16) # Charge status sometimes changed between left and right.
     if flipped:
         result['charging_left'] = (chargeStatus & 0b00000001) != 0
         result['charging_right'] = (chargeStatus & 0b00000010) != 0
     else:
         result['charging_left'] = (chargeStatus & 0b00000001) != 0
         result['charging_right'] = (chargeStatus & 0b00000010) != 0
-    result['charging_case'] = (chargeStatus & 0b00000100) != 0
+    result['charging_case'] = (chargeStatus & 0b00000100) != 0 # Only right value returns when AirPods are in case.
 
     return result
 
@@ -111,12 +106,14 @@ def fetch_status():
     loop.close()
     return data
 
-
 while True:
     result = fetch_status()
-
-    status = "L: " + str(result['left']) + " / R: " + str(result['right']) + " / C: " + str(result['case'])
+    
+    status = "L: " + str(result['left']) + str(result['charging_left']) + " / R: " + str(result['right']) + str(result['charging_right']) + " / C: " + str(result['case']) + str(result['charging_case'])
+    
     status = status.replace('-1', '?')
+    status = status.replace('True', '+')
+    status = status.replace('False', '')
 
     if result['model'] == "Pro":
         systray.update("orange.ico", status)
