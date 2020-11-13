@@ -3,11 +3,25 @@ from time import time,sleep
 from infi.systray import SysTrayIcon
 import asyncio, threading, webbrowser
 import win32api
+import sys, os
+
+# https://stackoverflow.com/questions/20602727/pyinstaller-generate-exe-file-folder-in-onefile-mode
+# Thanks!
+def app_path(path):
+    frozen = 'not'
+    if getattr(sys, 'frozen', False):
+            # we are running in executable mode
+            frozen = 'ever so'
+            app_dir = sys._MEIPASS
+    else:
+            # we are running in a normal Python environment
+            app_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(app_dir, path)
 
 def open_homepage(systray):
     webbrowser.open('https://github.com/obbcth/AirPodsClient', new=2)
 
-BAT = False
+BAT = True
 
 def switch_tray(systray):
     global BAT
@@ -45,7 +59,8 @@ menu_options = (
 )
 
 
-systray = SysTrayIcon("AirPods.ico", "Scanning devices...", menu_options)
+systray = SysTrayIcon(app_path("icons/AirPods.ico"), "Scanning devices...", menu_options)
+
 systray.start()
 
 
@@ -79,16 +94,16 @@ def icon_update(result):
             value = ""
 
         if result['model'] == "Pro":
-            systray.update("AirPodsPro" + str(value) + ".ico", status)
+            systray.update(app_path("icons/AirPodsPro" + str(value) + ".ico"), status)
 
         if result['model'] == "Unknown":
-            systray.update("AirPods" + str(value) + ".ico", status)
+            systray.update(app_path("icons/AirPods" + str(value) + ".ico"), status)
     else:
         if result['model'] == "Pro":
-            systray.update("AirPodsPro.ico", status)
+            systray.update(app_path("icons/AirPodsPro.ico"), status)
 
         if result['model'] == "Unknown":
-            systray.update("AirPods.ico", status)
+            systray.update(app_path("icons/AirPods.ico"), status)
 
 
 
