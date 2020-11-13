@@ -5,13 +5,12 @@ AirPods Client for Windows
 - Python 3
 - `bleak infi.systray (modified)`
 
-## Usage
+## Manually Run
 1. Clone this project.
-1. Install Python 3 and run `pip install bleak pybluez infi.systray`.
-1. Run `pythonw.exe AirPodsClient.py`.
+1. Install Python 3 and run `pip install bleak infi.systray`.
+1. Edit `infi.systray` like [this](https://github.com/Infinidat/infi.systray/pull/18).
+1. Run `python.exe AirPodsClient.py`.
 
-## Note
-- You should edit `infi.systray` like [this](https://github.com/Infinidat/infi.systray/pull/18)
 ## Reference
 - [ohanedan/Airpods-Windows-Service](https://github.com/ohanedan/Airpods-Windows-Service)
 - [Infinidat/infi.systray](https://github.com/Infinidat/infi.systray)
