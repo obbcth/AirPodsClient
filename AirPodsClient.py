@@ -1,14 +1,20 @@
 from bleak import discover
 from time import time,sleep
 from infi.systray import SysTrayIcon
-import asyncio, threading, bluetooth, webbrowser
+import asyncio, threading, webbrowser
 import win32api
 
 def open_homepage(systray):
     webbrowser.open('https://github.com/obbcth/AirPodsClient', new=2)
 
+BAT = False
+
 def switch_tray(systray):
-    pass
+    global BAT
+    if BAT:
+        BAT = False
+    else:
+        BAT = True
 
 AED = False # Automatic Ear Detection
 AED_Flag = True
@@ -18,14 +24,14 @@ def automatic_ear_detection(systray):
     if AED:
         menu_options = (
             ("Visit GitHub", None, open_homepage),
-            ("Automatic Ear Detection : Off", None, automatic_ear_detection),
+            ("(Experimental) Automatic Ear Detection : Off", None, automatic_ear_detection),
             ("Switch Tray Icon", None, switch_tray),
         )
         AED = False
     else:
         menu_options = (
             ("Visit GitHub", None, open_homepage),
-            ("Automatic Ear Detection : On", None, automatic_ear_detection),
+            ("(Experimental) Automatic Ear Detection : On", None, automatic_ear_detection),
             ("Switch Tray Icon", None, switch_tray),
         )
         AED = True
@@ -34,13 +40,57 @@ def automatic_ear_detection(systray):
 
 menu_options = (
     ("Visit GitHub", None, open_homepage),
-    ("Automatic Ear Detection : Off", None, automatic_ear_detection),
+    ("(Experimental) Automatic Ear Detection : Off", None, automatic_ear_detection),
     ("Switch Tray Icon", None, switch_tray),
 )
 
 
 systray = SysTrayIcon("AirPods.ico", "Scanning devices...", menu_options)
 systray.start()
+
+
+
+def icon_update(result):
+    global systray, status
+
+    if BAT:
+        
+        if result['left'] == -1 and result['right'] == -1:
+            value = 0
+        elif result['left'] == -1:
+            value = result['right'] // 10
+        elif result['right'] == -1:
+            value = result['left'] // 10
+        else:
+            value = (result['left'] + result['right']) // 2 // 10
+        if value == 3:
+            value = 2
+        if value == 4:
+            value = 3
+        if value == 5 or value == 6:
+            value = 4
+        if value == 7:
+            value = 5
+        if value == 8 or value == 9:
+            value = 6
+        if value == 10:
+            value = 7
+        if value == 0:
+            value = ""
+
+        if result['model'] == "Pro":
+            systray.update("AirPodsPro" + str(value) + ".ico", status)
+
+        if result['model'] == "Unknown":
+            systray.update("AirPods" + str(value) + ".ico", status)
+    else:
+        if result['model'] == "Pro":
+            systray.update("AirPodsPro.ico", status)
+
+        if result['model'] == "Unknown":
+            systray.update("AirPods.ico", status)
+
+
 
 async def run():
     result = EmptyResult()
@@ -180,11 +230,7 @@ while True:
     status = status.replace('True', '+')
     status = status.replace('False', '')
 
-    if result['model'] == "Pro":
-        systray.update("AirPodsPro.ico", status)
-
-    if result['model'] == "Unknown":
-        systray.update("AirPods.ico", status)
+    icon_update(result)
     
     if AED:
         if result['wearing'] == 0:
