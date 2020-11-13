@@ -1,15 +1,9 @@
 # AirPodsClient
 AirPods Client for Windows
 
-| Color | Detail |
-| ----- | ------ |
-| White       | Scanning Devices  |
-| Light Blue  | AirPods Pro       |
-| Light Green | AirPods Unknown   |
-
 ## Requirements
 - Python 3
-- `pip install bleak pybluez infi.systray`
+- `bleak infi.systray (modified)`
 
 ## Usage
 1. Clone this project.
