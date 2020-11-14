@@ -7,6 +7,10 @@ import sys, os
 
 # https://stackoverflow.com/questions/20602727/pyinstaller-generate-exe-file-folder-in-onefile-mode
 # Thanks!
+
+def on_quit_callback(systray):
+    sys.exit()
+
 def app_path(path):
     frozen = 'not'
     if getattr(sys, 'frozen', False):
@@ -59,7 +63,7 @@ menu_options = (
 )
 
 
-systray = SysTrayIcon(app_path("icons/AirPods.ico"), "Scanning devices...", menu_options)
+systray = SysTrayIcon(app_path("icons/AirPods.ico"), "Scanning devices...", menu_options, on_quit=on_quit_callback)
 
 systray.start()
 
