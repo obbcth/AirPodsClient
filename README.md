@@ -1,6 +1,10 @@
 # AirPodsClient
 AirPods Client for Windows
 
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/obbcth/AirPodsClient)](https://github.com/obbcth/AirPodsClient/releases)
+
+
+
 ## Requirements
 - Python 3
 - `bleak infi.systray (modified)`
