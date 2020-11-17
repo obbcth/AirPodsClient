@@ -4,9 +4,8 @@ from infi.systray import SysTrayIcon
 import asyncio, threading, webbrowser
 import win32api
 import sys, os
-
 import bluetooth
-import socket
+import time
 
 # https://stackoverflow.com/questions/20602727/pyinstaller-generate-exe-file-folder-in-onefile-mode
 # Thanks!
@@ -131,13 +130,13 @@ def icon_update(result):
             value = 2
         if value == 4:
             value = 3
-        if value == 5 or value == 6:
+        if value == 5:
             value = 4
-        if value == 7:
+        if value == 6 or value == 7:
             value = 5
-        if value == 8 or value == 9:
+        if value == 8:
             value = 6
-        if value == 10:
+        if value == 9 or value == 10:
             value = 7
         if value == 0:
             value = ""
@@ -290,12 +289,68 @@ def fetch_status():
     return data
 
 
+left_predict = 0 # these will store previous value 
+right_predict = 0
+left_time_predict = 0 
+right_time_predict = 0 
+
+left_time_gap = 0 # these will store time gap about 1 percent
+right_time_gap = 0
+
+left_time_preserve = 0 # for saving 10 
+right_time_preserve = 0
 
 while True:
     # if AED:
     # Set discover timeout 3 and make 3 threads
 
     result = fetch_status()
+
+    timestamp = int(time.time())
+    
+    # (Experimental) Predict battery value
+
+    if (left_predict == 0 and right_predict == 0): # First launch
+        if (result['left'] > 0 and result['right'] > 0): # If two values are not -1
+            left_predict = result['left'] # Record battery info
+            right_predict = result['right']
+            left_time_predict = timestamp # Record timestamp 
+            right_time_predict = timestamp
+    else:
+        # If not first launch
+        # Left
+        if (left_predict == result['left'] + 10): # If Battery level differ 10,
+            
+            # Record time gap
+            if (left_time_gap == 0): 
+                left_time_gap = (timestamp - left_time_predict) / 10 # Predict battery reduced 10 percent during time gap
+                left_time_preserve = timestamp
+            else:
+                for i in range(1, 11):
+                    if (timestamp >= left_time_preserve + left_time_gap * (11-i)):
+                        result['left'] = result['left'] + i
+                        break
+
+        elif (left_predict == result['left'] + 20): # If Battery level differ 20,
+            # Renew
+            left_predict = result['left'] + 10
+            left_time_predict = left_time_preserve
+            left_time_gap = 0
+    
+        # Right
+        if (right_predict == result['right'] + 10):
+            if (right_time_gap == 0):
+                right_time_gap = (timestamp - right_time_predict) / 10
+                right_time_preserve = timestamp
+            else:
+                for i in range(1, 11):
+                    if (timestamp >= right_time_preserve + right_time_gap * (11-i)):
+                        result['right'] = result['right'] + i
+                        break
+        elif (right_predict == result['right'] + 20):
+            right_predict = result['right'] + 10
+            right_time_predict = left_time_preserve
+            right_time_gap = 0
     
     status = "L: " + str(result['left']) + str(result['charging_left']) + " / R: " + str(result['right']) + str(result['charging_right']) + " / C: " + str(result['case']) + str(result['charging_case'])
     
