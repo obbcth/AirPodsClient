@@ -5,8 +5,14 @@ import asyncio, threading, webbrowser
 import win32api
 import sys, os
 
+import bluetooth
+import socket
+
 # https://stackoverflow.com/questions/20602727/pyinstaller-generate-exe-file-folder-in-onefile-mode
 # Thanks!
+
+def do_nothing(systray):
+    pass
 
 def on_quit_callback(systray):
     sys.exit()
@@ -25,6 +31,7 @@ def app_path(path):
 def open_homepage(systray):
     webbrowser.open('https://github.com/obbcth/AirPodsClient', new=2)
 
+
 BAT = True
 
 def switch_tray(systray):
@@ -34,32 +41,30 @@ def switch_tray(systray):
     else:
         BAT = True
 
+
 AED = False # Automatic Ear Detection
 AED_Flag = True
 
 def automatic_ear_detection(systray):
-    global AED 
+    global AED, menu_options
     if AED:
-        menu_options = (
-            ("Visit GitHub", None, open_homepage),
-            ("(Experimental) Automatic Ear Detection : Off", None, automatic_ear_detection),
-            ("Switch Tray Icon", None, switch_tray),
-        )
+        lst = list(menu_options)
+        lst[1] = ("(Experimental) Automatic Ear Detection : Off", None, automatic_ear_detection)
+        menu_options = tuple(lst)
         AED = False
     else:
-        menu_options = (
-            ("Visit GitHub", None, open_homepage),
-            ("(Experimental) Automatic Ear Detection : On", None, automatic_ear_detection),
-            ("Switch Tray Icon", None, switch_tray),
-        )
+        lst = list(menu_options)
+        lst[1] = ("(Experimental) Automatic Ear Detection : On", None, automatic_ear_detection)
+        menu_options = tuple(lst)
         AED = True
     systray.update(menu_options = menu_options)
 
 
 menu_options = (
-    ("Visit GitHub", None, open_homepage),
+    ("AirPodsClient", None, do_nothing),
     ("(Experimental) Automatic Ear Detection : Off", None, automatic_ear_detection),
     ("Switch Tray Icon", None, switch_tray),
+    ("Visit GitHub", None, open_homepage),
 )
 
 
@@ -68,9 +73,49 @@ systray = SysTrayIcon(app_path("icons/AirPods.ico"), "Scanning devices...", menu
 systray.start()
 
 
+GDN = False
+
+def get_device_name():
+    global GDN, menu_options
+
+    audio_devices = []
+
+    # Get Device Name
+    # AirPods Vendor ID is 76
+
+    nearby_devices = bluetooth.discover_devices(lookup_names=True, lookup_class=True)
+
+    print("found %d devices" % len(nearby_devices))
+    for addr, name, cl in nearby_devices:
+        print(" %s - %s - " % (addr, name) + hex(cl))
+
+        if (hex(cl) == '0x240418'):
+            # Is this yours?
+            audio_devices.append(name)
+
+    
+    lst = list(menu_options)
+
+    if(len(audio_devices) == 1):
+        lst[0] = (audio_devices[0], None, do_nothing)
+    elif(len(audio_devices) == 0):
+        lst[0] = ("AirPodsClient", None, do_nothing)
+    else:
+        # select device -> 
+        pass
+
+    menu_options = tuple(lst)
+    systray.update(menu_options = menu_options)
+
+    # Python 3.9 supports bluetooth RFCOMM
+
+    # https://stackoverflow.com/questions/62211886/python-bluetooth-on-windows-10
+    # Can we connect AirPods by this?
+
+    GDN = True
 
 def icon_update(result):
-    global systray, status
+    global systray, status, GDN
 
     if BAT:
         
@@ -109,6 +154,9 @@ def icon_update(result):
         if result['model'] == "Unknown":
             systray.update(app_path("icons/AirPods.ico"), status)
 
+    if GDN == False:
+        get_device_name()
+
 
 
 async def run():
@@ -129,6 +177,7 @@ async def run():
             result['addr'] = d.address
             
             hexData = d.metadata['manufacturer_data'][76].hex()
+            print(hexData)
             result['status'] = 1
 
             # 12th and 13th letter shows:
@@ -240,7 +289,12 @@ def fetch_status():
     loop.close()
     return data
 
+
+
 while True:
+    # if AED:
+    # Set discover timeout 3 and make 3 threads
+
     result = fetch_status()
     
     status = "L: " + str(result['left']) + str(result['charging_left']) + " / R: " + str(result['right']) + str(result['charging_right']) + " / C: " + str(result['case']) + str(result['charging_case'])
