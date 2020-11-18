@@ -328,9 +328,13 @@ while True:
         # If not first launch
         # Left
 
-        ## if (left_predict == result['left']) 
-        ## -> 배터리 퍼센트 대략 +5로 잡아두고 시작
-        ## 아래 코드 재활용
+        if (left_predict == result['left']): # First predict will start from +5 
+            for i in range(1, 6):
+                if (timestamp >= left_time_predict + left_time_gap * (6-i)):
+                    result['left'] = result['left'] + i
+                    break
+            if (left_predict == result['left']):
+                result['left'] = result['left'] + 5
 
         if (left_predict == result['left'] + 10): # If Battery level differ 10,
             
@@ -347,16 +351,25 @@ while True:
                     if (timestamp >= left_time_preserve + left_time_gap * (11-i)):
                         result['left'] = result['left'] + i
                         break
+                if (left_predict == result['left'] + 10):
+                    result['left'] = result['left'] + 10
 
         elif (left_predict == result['left'] + 20): # If Battery level differ 20,
             # Renew
             left_predict = result['left'] + 10
             left_time_predict = left_time_preserve
-            left_time_gap = 144
-            left_time_gap_bool = False
+            left_time_gap = (timestamp - left_time_preserve) / 10
+            left_time_preserve = timestamp
             result['left'] = result['left'] + 10
     
         # Right
+        if (right_predict == result['right']):
+            for i in range(1, 6):
+                if (timestamp >= right_time_predict + right_time_gap * (6-i)):
+                    result['right'] = result['right'] + i
+                    break
+            if (right_predict == result['right']):
+                result['right'] = result['right'] + 5
         if (right_predict == result['right'] + 10):
             if (right_time_gap_bool == False):
                 if (right_time_predict != 100):
@@ -369,11 +382,13 @@ while True:
                     if (timestamp >= right_time_preserve + right_time_gap * (11-i)):
                         result['right'] = result['right'] + i
                         break
+                if (right_predict == result['right'] + 10):
+                    result['right'] = result['right'] + 10
         elif (right_predict == result['right'] + 20):
             right_predict = result['right'] + 10
             right_time_predict = left_time_preserve
-            right_time_gap = 144
-            right_time_gap_bool = False
+            right_time_gap = (timestamp - right_time_preserve) / 10
+            right_time_preserve = timestamp
             result['right'] = result['right'] + 10
     
     status = "L: " + str(result['left']) + str(result['charging_left']) + " / R: " + str(result['right']) + str(result['charging_right']) + " / C: " + str(result['case']) + str(result['charging_case'])
