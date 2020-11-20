@@ -20,7 +20,7 @@ jobs:
           
       - name: Install modules
         run: |
-          pip install bleak pyinstaller
+          pip install bleak pyinstaller win10toast
           pip install --upgrade pip setuptools wheel
       
       - name: Install modified infi.systray
