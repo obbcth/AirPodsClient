@@ -1,0 +1,29 @@
+name: "Github Release Upload"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install modules
+        run: |
+          pip install pybluez bleak pyinstaller
+          pip install git+https://github.com/obbcth/infi.systray.git
+      
+      - name: Make exe with pyinstaller
+        run: pyinstaller AirPodsClient.py -i ./icons/AirPods.ico --hidden-import=pkg_resources.py2_warn --clean --noconfirm --noconsole --onefile --add-data ./icons;icons
+      
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Upload artifact
+          path: dist/AirPodsClient.exe
