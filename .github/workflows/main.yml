@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -17,7 +17,6 @@ jobs:
           
       - name: Install modules
         run: |
-          sudo apt-get install libbluetooth-dev
           pip install pybluez bleak pyinstaller
           pip install --upgrade pip setuptools wheel
       
@@ -29,9 +28,9 @@ jobs:
           projector devenv build
       
       - name: Make exe with pyinstaller
-        run: pyinstaller AirPodsClient.py -i icons/AirPods.ico --hidden-import=pkg_resources.py2_warn --clean --noconfirm --noconsole --onefile --add-data icons:icons
+        run: pyinstaller AirPodsClient.py -i icons/AirPods.ico --hidden-import=pkg_resources.py2_warn --clean --noconfirm --noconsole --onefile --add-data icons;icons
       
       - uses: actions/upload-artifact@v2
         with:
           name: Upload artifact
-          path: dist/AirPodsClient
+          path: dist/AirPodsClient.exe
