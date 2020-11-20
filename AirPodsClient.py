@@ -3,7 +3,7 @@ from time import time,sleep
 from infi.systray import SysTrayIcon
 from win10toast import ToastNotifier
 import asyncio, threading, webbrowser, win32api, sys, os, bluetooth, time
-import pkg_resources, pkg_resources.py2_warn # could resolve pyinstaller error
+import pkg_resources # could resolve pyinstaller error
 
 # https://stackoverflow.com/questions/20602727/pyinstaller-generate-exe-file-folder-in-onefile-mode
 # Thanks!
