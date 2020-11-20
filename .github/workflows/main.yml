@@ -15,6 +15,12 @@ jobs:
         with:
           python-version: 3.8
           
+      - name: Install Windows 10 SDK
+        shell: powershell
+        run: |
+          Invoke-WebRequest -Method Get -Uri https://go.microsoft.com/fwlink/?linkid=2083338 -OutFile sdksetup.exe -UseBasicParsing
+          Start-Process -Wait sdksetup.exe -ArgumentList "/q", "/norestart", "/features", "OptionId.WindowsDesktopSoftwareDevelopmentKit", "OptionId.NetFxSoftwareDevelopmentKit"
+          
       - name: Install modules
         run: |
           pip install pybluez bleak pyinstaller
