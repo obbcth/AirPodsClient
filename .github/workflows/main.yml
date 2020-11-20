@@ -17,6 +17,7 @@ jobs:
           
       - name: Install modules
         run: |
+          sudo apt-get install libbluetooth-dev
           pip install pybluez bleak pyinstaller
       
       - name: Make exe with pyinstaller
