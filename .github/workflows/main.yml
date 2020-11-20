@@ -16,15 +16,11 @@ jobs:
           python-version: 3.8
           
       - name: Install Windows 10 SDK
-        shell: powershell
-        run: |
-          Invoke-WebRequest -Method Get -Uri https://go.microsoft.com/fwlink/?linkid=2083338 -OutFile sdksetup.exe -UseBasicParsing
-          Start-Process -Wait sdksetup.exe -ArgumentList "/q", "/norestart", "/features", "OptionId.WindowsDesktopSoftwareDevelopmentKit", "OptionId.NetFxSoftwareDevelopmentKit"
-          
+        run: choco install windows-sdk-10.0
           
       - name: Install modules
         run: |
-          pip install pybluez bleak pyinstaller
+          pip install bleak pyinstaller
           pip install --upgrade pip setuptools wheel
       
       - name: Install modified infi.systray
@@ -34,8 +30,12 @@ jobs:
           easy_install -U infi.projector
           projector devenv build
       
+      - name: Install latest pybluez
+        run: |
+          pip install git+https://github.com/pybluez/pybluez.git
+      
       - name: Make exe with pyinstaller
-        run: python -m pyinstaller AirPodsClient.py -i icons/AirPods.ico --hidden-import=pkg_resources.py2_warn --clean --noconfirm --noconsole --onefile --add-data icons;icons
+        run: pyinstaller AirPodsClient.py -i icons/AirPods.ico --hidden-import=pkg_resources.py2_warn --clean --noconfirm --noconsole --onefile --add-data icons;icons
       
       - uses: actions/upload-artifact@v2
         with:
