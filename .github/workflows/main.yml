@@ -29,8 +29,7 @@ jobs:
           cd systray
           easy_install -U infi.projector
           projector devenv build
-          dir
-          tree
+          python setup.py install
       
       - name: Install latest pybluez
         run: |
