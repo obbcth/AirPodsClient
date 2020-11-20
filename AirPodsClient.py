@@ -1,11 +1,8 @@
 from bleak import discover
 from time import time,sleep
 from infi.systray import SysTrayIcon
-import asyncio, threading, webbrowser
-import win32api
-import sys, os
-import bluetooth
-import time
+from win10toast import ToastNotifier
+import asyncio, threading, webbrowser, win32api, sys, os, bluetooth, time
 
 # https://stackoverflow.com/questions/20602727/pyinstaller-generate-exe-file-folder-in-onefile-mode
 # Thanks!
@@ -113,34 +110,45 @@ def get_device_name():
 
     GDN = True
 
+ALERT = False
+
 def icon_update(result):
-    global systray, status, GDN
+    global systray, status, GDN, menu_options, ALERT
+    lst = list(menu_options)
+
+    if result['left'] == -1 and result['right'] == -1:
+        value = 0
+    elif result['left'] == -1:
+        value = result['right'] // 10
+    elif result['right'] == -1:
+        value = result['left'] // 10
+    else:
+        value = (result['left'] + result['right']) // 2 // 10
+    if value == 3:
+        value = 2
+    if value == 4:
+        value = 3
+    if value == 5:
+        value = 4
+    if value == 6 or value == 7:
+        value = 5
+    if value == 8:
+        value = 6
+    if value == 9 or value == 10:
+        value = 7
+    if value == 0:
+        value = ""
+
+    if value == 1:
+        if not ALERT:
+            toaster = ToastNotifier()
+            toaster.show_toast(lst[0][0],
+            "Low Battery",
+            icon_path=None,
+            duration=10)
+            ALERT = True
 
     if BAT:
-        
-        if result['left'] == -1 and result['right'] == -1:
-            value = 0
-        elif result['left'] == -1:
-            value = result['right'] // 10
-        elif result['right'] == -1:
-            value = result['left'] // 10
-        else:
-            value = (result['left'] + result['right']) // 2 // 10
-        if value == 3:
-            value = 2
-        if value == 4:
-            value = 3
-        if value == 5:
-            value = 4
-        if value == 6 or value == 7:
-            value = 5
-        if value == 8:
-            value = 6
-        if value == 9 or value == 10:
-            value = 7
-        if value == 0:
-            value = ""
-
         if result['model'] == "Pro":
             systray.update(app_path("icons/AirPodsPro" + str(value) + ".ico"), status)
 
@@ -155,7 +163,6 @@ def icon_update(result):
 
     if GDN == False:
         get_device_name()
-
 
 
 async def run():
@@ -341,7 +348,7 @@ while True:
             # Record time gap
             # if predict 100 -> skip record
             if (left_time_gap_bool == False): 
-                if (left_time_predict != 100):
+                if (left_predict != 100):
                     left_time_gap = (timestamp - left_time_predict) / 10 # Predict battery reduced 10 percent during time gap
                     left_time_preserve = timestamp
                 left_time_gap_bool = True
@@ -372,7 +379,7 @@ while True:
                 result['right'] = result['right'] + 5
         if (right_predict == result['right'] + 10):
             if (right_time_gap_bool == False):
-                if (right_time_predict != 100):
+                if (right_predict != 100):
                     right_time_gap = (timestamp - right_time_predict) / 10
                     right_time_preserve = timestamp
                 right_time_gap_bool = True
