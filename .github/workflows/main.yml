@@ -19,6 +19,7 @@ jobs:
         run: |
           sudo apt-get install libbluetooth-dev
           pip install pybluez bleak pyinstaller
+          pip install --upgrade pip setuptools wheel
       
       - name: Install modified infi.systray
         run: |
