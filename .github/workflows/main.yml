@@ -34,4 +34,4 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: Upload artifact
-          path: dist/AirPodsClient.exe
+          path: dist/AirPodsClient
