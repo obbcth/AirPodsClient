@@ -20,8 +20,15 @@ jobs:
           sudo apt-get install libbluetooth-dev
           pip install pybluez bleak pyinstaller
       
+      - name: Install modified infi.systray
+        run: |
+          git clone https://github.com/obbcth/infi.systray systray
+          cd systray
+          easy_install -U infi.projector
+          projector devenv build
+      
       - name: Make exe with pyinstaller
-        run: pyinstaller AirPodsClient.py -i ./icons/AirPods.ico --hidden-import=pkg_resources.py2_warn --clean --noconfirm --noconsole --onefile --add-data ./icons;icons
+        run: pyinstaller AirPodsClient.py -i icons/AirPods.ico --hidden-import=pkg_resources.py2_warn --clean --noconfirm --noconsole --onefile --add-data icons;icons
       
       - uses: actions/upload-artifact@v2
         with:
