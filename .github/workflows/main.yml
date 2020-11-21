@@ -1,10 +1,21 @@
-name: "Github Artifact Upload"
+name: Build
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  # Also trigger on page_build, as well as release created events
+  page_build:
+  release:
+    types: # This configuration does not affect the page_build event above
+      - created
 
 jobs:
   build:
+    name: Build AirPodsClient
     runs-on: windows-latest
 
     steps:
@@ -38,7 +49,8 @@ jobs:
       - name: Make exe with pyinstaller
         run: pyinstaller AirPodsClient.py -i ./icons/AirPods.ico --hidden-import=pkg_resources.py2_warn --clean --noconfirm --onefile --add-data "./icons;icons"
       
-      - uses: actions/upload-artifact@v2
+      - name: Upload AirPodsClient
+        uses: actions/upload-artifact@v2
         with:
-          name: Upload artifact
+          name: AirPodsClient
           path: dist/AirPodsClient.exe
